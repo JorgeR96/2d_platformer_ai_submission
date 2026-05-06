@@ -3,6 +3,10 @@ extends RefCounted
 
 const EDGE_WALK := "walk"
 const EDGE_JUMP := "jump"
+const COST_WALK := 1
+const COST_JUMP := 2
+const COST_RISKY_JUMP := 3
+const DEFAULT_GOAL_NODE_ID := 24
 const ROUTE_BASELINE := "Baseline Route"
 const ROUTE_RISKY_SHORTCUT := "Risky Shortcut"
 const ROUTE_SAFE_DETOUR := "Safe Detour"
@@ -22,6 +26,7 @@ var _edge_kinds: Dictionary = {}
 var _edge_costs: Dictionary = {}
 var _edge_routes: Dictionary = {}
 var _edge_count: int = 0
+var _heuristic_goal_id: int = -1
 var current_search_mode: int = SearchMode.UNIFORM_COST
 
 var last_planning_time_us: int = 0
@@ -44,73 +49,74 @@ func build(graph_root: Node = null) -> void:
 	_edge_costs.clear()
 	_edge_routes.clear()
 	_edge_count = 0
+	_heuristic_goal_id = -1
 
 	var scene_positions := _read_scene_node_positions(graph_root)
-	# Hand-labeled heuristic values make the algorithm differences visible in the demo:
-	# Greedy is tempted upward by lower h values, while A* weighs those labels against path cost.
-	_add(0, scene_positions.get(0, Vector2(100, 480)), 30)    # start on LeftGround
-	_add(1, scene_positions.get(1, Vector2(430, 480)), 29)    # LeftGround right takeoff
-	_add(2, scene_positions.get(2, Vector2(610, 480)), 28)    # MidGround1 left landing
-	_add(3, scene_positions.get(3, Vector2(980, 480)), 27)    # MidGround1 middle
-	_add(4, scene_positions.get(4, Vector2(1360, 480)), 26)   # MidGround1 right branch
-	_add(5, scene_positions.get(5, Vector2(1510, 379)), 19)   # upper route: MidGround3 left landing
-	_add(6, scene_positions.get(6, Vector2(1730, 379)), 18)   # upper route: MidGround3 right takeoff
-	_add(7, scene_positions.get(7, Vector2(1885, 377)), 17)   # upper route: FinalGround2 left landing
-	_add(8, scene_positions.get(8, Vector2(2135, 377)), 16)   # upper route: FinalGround2 right takeoff
-	_add(9, scene_positions.get(9, Vector2(2290, 377)), 15)   # upper route: MidGround5 left landing
-	_add(10, scene_positions.get(10, Vector2(2525, 377)), 14) # upper route: MidGround5 right takeoff
-	_add(11, scene_positions.get(11, Vector2(2685, 376)), 13) # upper route: MidGround6 left landing
-	_add(12, scene_positions.get(12, Vector2(2920, 376)), 12) # upper route: MidGround6 right drop
-	_add(13, scene_positions.get(13, Vector2(3270, 717)), 3)  # EndGround before final spike strip
-	_add(14, scene_positions.get(14, Vector2(1550, 530)), 20) # lower route: MidGround2
-	_add(15, scene_positions.get(15, Vector2(1985, 584)), 18) # lower route: MidGround4 right takeoff
-	_add(16, scene_positions.get(16, Vector2(2140, 586)), 16) # lower route: FinalGround left landing
-	_add(17, scene_positions.get(17, Vector2(2185, 586)), 14) # lower route: before spike strip 1
-	_add(18, scene_positions.get(18, Vector2(2380, 586)), 12) # lower route: after spike strip 1
-	_add(19, scene_positions.get(19, Vector2(2520, 586)), 10) # lower route: MidGround8 left landing
-	_add(20, scene_positions.get(20, Vector2(2760, 586)), 8)  # lower route: MidGround8 right drop
-	_add(21, scene_positions.get(21, Vector2(3020, 780)), 6)  # lower long platform takeoff
-	_add(22, scene_positions.get(22, Vector2(3470, 717)), 2)  # EndGround after final spike strip
-	_add(23, scene_positions.get(23, Vector2(3520, 717)), 1)  # EndGround after spike strip 2
-	_add(24, scene_positions.get(24, Vector2(3711, 717)), 0)  # goal platform / flagpole
-	_add(25, scene_positions.get(25, Vector2(2835, 780)), 9)  # lower long platform left landing
-	_add(26, scene_positions.get(26, Vector2(2930, 780)), 8)  # lower long platform middle
-	_add(27, scene_positions.get(27, Vector2(3105, 717)), 4)  # EndGround landing from lower platform
+	_add(0, scene_positions.get(0, Vector2(100, 480)))    # start on LeftGround
+	_add(1, scene_positions.get(1, Vector2(430, 480)))    # LeftGround right takeoff
+	_add(2, scene_positions.get(2, Vector2(610, 480)))    # MidGround1 left landing
+	_add(3, scene_positions.get(3, Vector2(980, 480)))    # MidGround1 middle
+	_add(4, scene_positions.get(4, Vector2(1360, 480)))   # MidGround1 right branch
+	_add(5, scene_positions.get(5, Vector2(1510, 379)))   # upper route: MidGround3 left landing
+	_add(6, scene_positions.get(6, Vector2(1730, 379)))   # upper route: MidGround3 right takeoff
+	_add(7, scene_positions.get(7, Vector2(1885, 377)))   # upper route: FinalGround2 left landing
+	_add(8, scene_positions.get(8, Vector2(2135, 377)))   # upper route: FinalGround2 right takeoff
+	_add(9, scene_positions.get(9, Vector2(2290, 377)))   # upper route: MidGround5 left landing
+	_add(10, scene_positions.get(10, Vector2(2525, 377))) # upper route: MidGround5 right takeoff
+	_add(11, scene_positions.get(11, Vector2(2685, 376))) # upper route: MidGround6 left landing
+	_add(12, scene_positions.get(12, Vector2(2920, 376))) # upper route: MidGround6 right drop
+	_add(13, scene_positions.get(13, Vector2(3270, 717))) # EndGround before final spike strip
+	_add(14, scene_positions.get(14, Vector2(1550, 530))) # lower route: MidGround2
+	_add(15, scene_positions.get(15, Vector2(1985, 584))) # lower route: MidGround4 right takeoff
+	_add(16, scene_positions.get(16, Vector2(2140, 586))) # lower route: FinalGround left landing
+	_add(17, scene_positions.get(17, Vector2(2185, 586))) # lower route: before spike strip 1
+	_add(18, scene_positions.get(18, Vector2(2380, 586))) # lower route: after spike strip 1
+	_add(19, scene_positions.get(19, Vector2(2520, 586))) # lower route: MidGround8 left landing
+	_add(20, scene_positions.get(20, Vector2(2760, 586))) # lower route: MidGround8 right drop
+	_add(21, scene_positions.get(21, Vector2(3020, 780))) # lower long platform takeoff
+	_add(22, scene_positions.get(22, Vector2(3470, 717))) # EndGround after final spike strip
+	_add(23, scene_positions.get(23, Vector2(3520, 717))) # EndGround after spike strip 2
+	_add(24, scene_positions.get(24, Vector2(3711, 717))) # goal platform / flagpole
+	_add(25, scene_positions.get(25, Vector2(2835, 780))) # lower long platform left landing
+	_add(26, scene_positions.get(26, Vector2(2930, 780))) # lower long platform middle
+	_add(27, scene_positions.get(27, Vector2(3105, 717))) # EndGround landing from lower platform
 
 	# Edges are directed toward the goal. The fixed level and path follower do not need reverse traversal.
-	_connect(0, 1, EDGE_WALK, 1)
-	_connect(1, 2, EDGE_JUMP, 2)
-	_connect(2, 3, EDGE_WALK, 1)
-	_connect(3, 4, EDGE_WALK, 1)
+	_connect(0, 1, EDGE_WALK, COST_WALK)
+	_connect(1, 2, EDGE_JUMP, COST_JUMP)
+	_connect(2, 3, EDGE_WALK, COST_WALK)
+	_connect(3, 4, EDGE_WALK, COST_WALK)
 
-	_connect(4, 5, EDGE_JUMP, 3, ROUTE_SAFE_DETOUR)
-	_connect(5, 6, EDGE_WALK, 1, ROUTE_SAFE_DETOUR)
-	_connect(6, 7, EDGE_JUMP, 2, ROUTE_SAFE_DETOUR)
-	_connect(7, 8, EDGE_WALK, 1, ROUTE_SAFE_DETOUR)
-	_connect(8, 9, EDGE_JUMP, 2, ROUTE_SAFE_DETOUR)
-	_connect(9, 10, EDGE_WALK, 1, ROUTE_SAFE_DETOUR)
-	_connect(10, 11, EDGE_JUMP, 2, ROUTE_SAFE_DETOUR)
-	_connect(11, 12, EDGE_WALK, 1, ROUTE_SAFE_DETOUR)
-	_connect(12, 21, EDGE_JUMP, 3, ROUTE_SAFE_DETOUR)
+	_connect(4, 5, EDGE_JUMP, COST_RISKY_JUMP, ROUTE_SAFE_DETOUR)
+	_connect(5, 6, EDGE_WALK, COST_WALK, ROUTE_SAFE_DETOUR)
+	_connect(6, 7, EDGE_JUMP, COST_JUMP, ROUTE_SAFE_DETOUR)
+	_connect(7, 8, EDGE_WALK, COST_WALK, ROUTE_SAFE_DETOUR)
+	_connect(8, 9, EDGE_JUMP, COST_JUMP, ROUTE_SAFE_DETOUR)
+	_connect(9, 10, EDGE_WALK, COST_WALK, ROUTE_SAFE_DETOUR)
+	_connect(10, 11, EDGE_JUMP, COST_JUMP, ROUTE_SAFE_DETOUR)
+	_connect(11, 12, EDGE_WALK, COST_WALK, ROUTE_SAFE_DETOUR)
+	_connect(12, 21, EDGE_JUMP, COST_RISKY_JUMP, ROUTE_SAFE_DETOUR)
 
-	_connect(4, 14, EDGE_WALK, 1, ROUTE_RISKY_SHORTCUT)
-	_connect(14, 15, EDGE_WALK, 1, ROUTE_RISKY_SHORTCUT)
-	_connect(15, 16, EDGE_JUMP, 2, ROUTE_RISKY_SHORTCUT)
-	_connect(16, 17, EDGE_WALK, 1, ROUTE_RISKY_SHORTCUT)
-	_connect(17, 18, EDGE_JUMP, 3, ROUTE_RISKY_SHORTCUT)
-	_connect(18, 19, EDGE_JUMP, 2, ROUTE_RISKY_SHORTCUT)
-	_connect(19, 20, EDGE_WALK, 1, ROUTE_RISKY_SHORTCUT)
-	_connect(20, 21, EDGE_JUMP, 2, ROUTE_RISKY_SHORTCUT)
+	_connect(4, 14, EDGE_WALK, COST_WALK, ROUTE_RISKY_SHORTCUT)
+	_connect(14, 15, EDGE_WALK, COST_WALK, ROUTE_RISKY_SHORTCUT)
+	_connect(15, 16, EDGE_JUMP, COST_JUMP, ROUTE_RISKY_SHORTCUT)
+	_connect(16, 17, EDGE_WALK, COST_WALK, ROUTE_RISKY_SHORTCUT)
+	_connect(17, 18, EDGE_JUMP, COST_RISKY_JUMP, ROUTE_RISKY_SHORTCUT)
+	_connect(18, 19, EDGE_JUMP, COST_JUMP, ROUTE_RISKY_SHORTCUT)
+	_connect(19, 20, EDGE_WALK, COST_WALK, ROUTE_RISKY_SHORTCUT)
+	_connect(20, 21, EDGE_JUMP, COST_JUMP, ROUTE_RISKY_SHORTCUT)
 
-	_connect(15, 25, EDGE_JUMP, 4, ROUTE_SAFE_DETOUR)
-	_connect(25, 26, EDGE_WALK, 1, ROUTE_SAFE_DETOUR)
-	_connect(26, 21, EDGE_WALK, 1, ROUTE_SAFE_DETOUR)
+	_connect(15, 25, EDGE_JUMP, COST_RISKY_JUMP + 1, ROUTE_SAFE_DETOUR)
+	_connect(25, 26, EDGE_WALK, COST_WALK, ROUTE_SAFE_DETOUR)
+	_connect(26, 21, EDGE_WALK, COST_WALK, ROUTE_SAFE_DETOUR)
 
-	_connect(21, 27, EDGE_JUMP, 2)
-	_connect(27, 13, EDGE_WALK, 1)
-	_connect(13, 22, EDGE_JUMP, 3)
-	_connect(22, 23, EDGE_WALK, 1)
-	_connect(23, 24, EDGE_WALK, 1)
+	_connect(21, 27, EDGE_JUMP, COST_JUMP)
+	_connect(27, 13, EDGE_WALK, COST_WALK)
+	_connect(13, 22, EDGE_JUMP, COST_RISKY_JUMP)
+	_connect(22, 23, EDGE_WALK, COST_WALK)
+	_connect(23, 24, EDGE_WALK, COST_WALK)
+
+	_recalculate_heuristics(DEFAULT_GOAL_NODE_ID)
 	last_graph_node_count = _points.size()
 	last_graph_edge_count = _edge_count
 
@@ -118,6 +124,8 @@ func plan(start_world: Vector2, goal_world: Vector2) -> Array:
 	var t0: int = Time.get_ticks_usec()
 	var start_id: int = _closest_point(start_world)
 	var goal_id: int = _closest_point(goal_world)
+	if goal_id != _heuristic_goal_id:
+		_recalculate_heuristics(goal_id)
 
 	# Shared frontier search. The selected mode only changes how frontier priority is scored.
 	var open_set: Array = [start_id]
@@ -233,9 +241,9 @@ func _collect_scene_node_positions(node: Node, positions: Dictionary) -> void:
 	for child in node.get_children():
 		_collect_scene_node_positions(child, positions)
 
-func _add(id: int, pos: Vector2, heuristic: int) -> void:
+func _add(id: int, pos: Vector2) -> void:
 	_points[id] = pos
-	_heuristics[id] = heuristic
+	_heuristics[id] = 0.0
 	if not (id in _neighbors):
 		_neighbors[id] = []
 
@@ -245,6 +253,34 @@ func _connect(a: int, b: int, kind: String, cost: int, route_name: String = ROUT
 	_edge_costs[_edge_key(a, b)] = cost
 	_edge_routes[_edge_key(a, b)] = route_name
 	_edge_count += 1
+
+func _recalculate_heuristics(goal_id: int) -> void:
+	_heuristic_goal_id = goal_id
+	for id in _points:
+		_heuristics[id] = 0.0
+	if not _points.has(goal_id):
+		return
+
+	var reverse_neighbors := {}
+	for id in _points:
+		reverse_neighbors[id] = []
+	for from_id in _neighbors:
+		for to_id in _neighbors[from_id]:
+			if not reverse_neighbors.has(to_id):
+				reverse_neighbors[to_id] = []
+			reverse_neighbors[to_id].append(from_id)
+
+	var queue: Array = [goal_id]
+	var visited: Dictionary = {goal_id: true}
+	while queue.size() > 0:
+		var current: int = queue.pop_front()
+		for predecessor_id in reverse_neighbors.get(current, []):
+			if predecessor_id in visited:
+				continue
+			# Lower bound: every real graph edge costs at least COST_WALK.
+			_heuristics[predecessor_id] = _heuristics[current] + COST_WALK
+			visited[predecessor_id] = true
+			queue.append(predecessor_id)
 
 func _edge_key(a: int, b: int) -> String:
 	return "%d-%d" % [a, b]

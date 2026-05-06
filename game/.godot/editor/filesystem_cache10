@@ -1,5 +1,5 @@
 63f7b34db8d8cdea90c76aacccf841ec
-::res://::1778054440
+::res://::1778102961
 export_presets.cfg::TextFile::-1::1778054440::0::1::::<><><>0<>0<><>::
 main.tscn::PackedScene::6559445680999094311::1778053185::0::1::::<><><>0<>0<><>::uid://wd4c1174bc45::::res://scripts/demo_manager.gd<>uid://b52lkrec2vwfm::::res://scripts/player_controller.gd<>uid://cg43xfwkx7wx1::::res://scripts/agent/path_following_agent.gd<>uid://dph2cg0mal1gc::::res://scripts/visualization/search_graph_overlay.gd<>uid://61evw7qx37x5::::res://scripts/search/search_graph_node.gd<>uid://bv8kd0y0f0gs0::::res://sprites/girl_player/idle_girl/idle.png<>uid://dr0upns17j6hm::::res://sprites/girl_player/jump_girl/jump.png<>uid://cn5tty0ujilou::::res://sprites/girl_player/run_girl/run_girl.png<>uid://1fx72vcr0qa3::::res://sprites/gameAudio/Platformer_audio.mp3
 ::res://scripts/::1778053147
@@ -10,7 +10,7 @@ path_following_agent.gd::GDScript::5255582830228225328::1778054854::0::1::::AICo
 ::res://scripts/search/::1778043740
 search_graph_node.gd::GDScript::2229809549733912060::1778043585::0::1::::SearchGraphNode<>Marker2D<><>0<>0<><>::
 search_metrics.gd::GDScript::7484170296363992121::1778054854::0::1::::RunMetrics<>RefCounted<><>0<>0<><>::
-search_planner.gd::GDScript::8036039406095720597::1778050179::0::1::::AIPlanner<>RefCounted<><>0<>0<><>::
+search_planner.gd::GDScript::8036039406095720597::1778102432::0::1::::AIPlanner<>RefCounted<><>0<>0<><>::
 ::res://scripts/visualization/::1778041315
 search_graph_overlay.gd::GDScript::8228188634626610638::1778048634::0::1::::SearchGraphOverlay<>Node2D<><>0<>0<><>::
 ::res://sprites/::1778051928

@@ -27,5 +27,5 @@ Open `http://localhost:8000` in a browser.
 ## Search Modes
 
 - Uniform Cost Search: uses cost so far
-- Greedy Best-First Search: uses heuristic estimate
-- A* Search: uses cost so far + heuristic estimate
+- Greedy Best-First Search: uses a graph-derived lower-bound heuristic estimate
+- A* Search: uses cost so far + graph-derived lower-bound heuristic estimate
