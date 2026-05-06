@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Search Platformer</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <header class="site-header">
+    <h1>Search Platformer</h1>
+  </header>
+  <main class="game-wrapper">
+    <div class="game-frame">
+      <canvas id="game-canvas" width="960" height="540" tabindex="0">
+        HTML5 canvas appears to be unsupported in your browser.
+      </canvas>
+      <p id="game-status" class="game-status" role="status">Loading&hellip;</p>
+    </div>
+    <section class="ai-controls" aria-label="AI search controls">
+      <label for="search-mode-select">Search Mode</label>
+      <select id="search-mode-select">
+        <option value="Uniform Cost Search">Uniform Cost Search</option>
+        <option value="Greedy Best-First Search">Greedy Best-First Search</option>
+        <option value="A* Search">A* Search</option>
+      </select>
+      <button id="run-ai-button" type="button">Run AI</button>
+    </section>
+    <p class="controls-hint">
+      Move <kbd>A</kbd>/<kbd>D</kbd> &middot; Jump <kbd>Space</kbd>/<kbd>W</kbd> &middot; AI <kbd>T</kbd> &middot; Graph <kbd>V</kbd> &middot; Restart <kbd>R</kbd>
+    </p>
+
+    <section class="results-panel" aria-labelledby="results-heading">
+      <h2 id="results-heading">Search comparison</h2>
+      <div class="results-table-wrap">
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th scope="col">Search Mode</th>
+              <th scope="col">Result</th>
+              <th scope="col">Runtime</th>
+              <th scope="col">Nodes</th>
+              <th scope="col">Path</th>
+              <th scope="col">Cost</th>
+              <th scope="col">Jumps</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr id="result-ucs">
+              <th scope="row">Uniform Cost Search</th>
+              <td data-metric="result">-</td>
+              <td data-metric="runtime">-</td>
+              <td data-metric="nodes">-</td>
+              <td data-metric="path">-</td>
+              <td data-metric="cost">-</td>
+              <td data-metric="jumps">-</td>
+            </tr>
+            <tr id="result-greedy">
+              <th scope="row">Greedy Best-First Search</th>
+              <td data-metric="result">-</td>
+              <td data-metric="runtime">-</td>
+              <td data-metric="nodes">-</td>
+              <td data-metric="path">-</td>
+              <td data-metric="cost">-</td>
+              <td data-metric="jumps">-</td>
+            </tr>
+            <tr id="result-astar">
+              <th scope="row">A* Search</th>
+              <td data-metric="result">-</td>
+              <td data-metric="runtime">-</td>
+              <td data-metric="nodes">-</td>
+              <td data-metric="path">-</td>
+              <td data-metric="cost">-</td>
+              <td data-metric="jumps">-</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+  <script src="app.js" defer></script>
+</body>
+
+</html>
