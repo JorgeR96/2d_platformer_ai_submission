@@ -1,0 +1,667 @@
+[gd_scene format=3 uid="uid://c0ppd2q2c6b6n"]
+
+[ext_resource type="Script" uid="uid://wd4c1174bc45" path="res://scripts/demo_manager.gd" id="1_main"]
+[ext_resource type="Script" uid="uid://b52lkrec2vwfm" path="res://scripts/player_controller.gd" id="2_player"]
+[ext_resource type="Script" uid="uid://cg43xfwkx7wx1" path="res://scripts/agent/path_following_agent.gd" id="3_ai_controller"]
+[ext_resource type="Script" uid="uid://dph2cg0mal1gc" path="res://scripts/visualization/search_graph_overlay.gd" id="4_search_overlay"]
+[ext_resource type="Script" uid="uid://61evw7qx37x5" path="res://scripts/search/search_graph_node.gd" id="5_search_graph_node"]
+[ext_resource type="Texture2D" uid="uid://bv8kd0y0f0gs0" path="res://sprites/girl_player/idle_girl/idle.png" id="7_efxa6"]
+[ext_resource type="Texture2D" uid="uid://dr0upns17j6hm" path="res://sprites/girl_player/jump_girl/jump.png" id="8_dg77c"]
+[ext_resource type="Texture2D" uid="uid://cn5tty0ujilou" path="res://sprites/girl_player/run_girl/run_girl.png" id="9_ycdy4"]
+[ext_resource type="AudioStream" uid="uid://1fx72vcr0qa3" path="res://sprites/gameAudio/Platformer_audio.mp3" id="12_dg77c"]
+
+[sub_resource type="RectangleShape2D" id="LeftGroundShape"]
+size = Vector2(458, 60)
+
+[sub_resource type="RectangleShape2D" id="RightGroundShape"]
+size = Vector2(840, 60)
+
+[sub_resource type="RectangleShape2D" id="MidGround2Shape"]
+size = Vector2(286, 60)
+
+[sub_resource type="RectangleShape2D" id="FinalGroundShape"]
+size = Vector2(300, 60)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5vw27"]
+size = Vector2(1096, 59)
+
+[sub_resource type="RectangleShape2D" id="EndGroundShape"]
+size = Vector2(760, 60)
+
+[sub_resource type="RectangleShape2D" id="PlayerShape"]
+size = Vector2(58, 69)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_seu75"]
+atlas = ExtResource("7_efxa6")
+region = Rect2(0, 0, 385, 500)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_htxhm"]
+atlas = ExtResource("7_efxa6")
+region = Rect2(385, 0, 385, 500)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jq2sk"]
+atlas = ExtResource("7_efxa6")
+region = Rect2(770, 0, 385, 500)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4k2k6"]
+atlas = ExtResource("7_efxa6")
+region = Rect2(1155, 0, 385, 500)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0rl1p"]
+atlas = ExtResource("7_efxa6")
+region = Rect2(770, 0, 385, 500)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ok6jj"]
+atlas = ExtResource("7_efxa6")
+region = Rect2(385, 0, 385, 500)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_facbu"]
+atlas = ExtResource("8_dg77c")
+region = Rect2(0, 0, 433, 420)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_b1qrp"]
+atlas = ExtResource("8_dg77c")
+region = Rect2(433, 0, 433, 420)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_come4"]
+atlas = ExtResource("8_dg77c")
+region = Rect2(866, 0, 433, 420)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_h8e4i"]
+atlas = ExtResource("8_dg77c")
+region = Rect2(1299, 0, 433, 420)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4lmeg"]
+atlas = ExtResource("9_ycdy4")
+region = Rect2(0, 0, 342, 500)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0cp0l"]
+atlas = ExtResource("9_ycdy4")
+region = Rect2(342, 0, 342, 500)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_d2t1y"]
+atlas = ExtResource("9_ycdy4")
+region = Rect2(684, 0, 342, 500)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gngh3"]
+atlas = ExtResource("9_ycdy4")
+region = Rect2(1026, 0, 342, 500)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0n3wm"]
+atlas = ExtResource("9_ycdy4")
+region = Rect2(1368, 0, 342, 500)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qnost"]
+atlas = ExtResource("9_ycdy4")
+region = Rect2(1710, 0, 342, 500)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wnkbs"]
+atlas = ExtResource("9_ycdy4")
+region = Rect2(1368, 0, 342, 500)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_f6a44"]
+atlas = ExtResource("9_ycdy4")
+region = Rect2(1026, 0, 342, 500)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0cbny"]
+atlas = ExtResource("9_ycdy4")
+region = Rect2(684, 0, 342, 500)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hrvbo"]
+atlas = ExtResource("9_ycdy4")
+region = Rect2(342, 0, 342, 500)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_getpj"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_seu75")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_htxhm")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jq2sk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4k2k6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0rl1p")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ok6jj")
+}],
+"loop": true,
+"name": &"1_idle_girl",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_facbu")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_b1qrp")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_come4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_h8e4i")
+}],
+"loop": true,
+"name": &"1_jump_girl",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4lmeg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0cp0l")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_d2t1y")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gngh3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0n3wm")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qnost")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wnkbs")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_f6a44")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0cbny")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hrvbo")
+}],
+"loop": true,
+"name": &"1_run_girl",
+"speed": 8.0
+}]
+
+[sub_resource type="RectangleShape2D" id="FlagShape"]
+size = Vector2(30, 220)
+
+[sub_resource type="RectangleShape2D" id="SpikeShape"]
+size = Vector2(72, 10)
+
+[sub_resource type="RectangleShape2D" id="KillZoneShape"]
+size = Vector2(4200, 80)
+
+[node name="Main" type="Node2D" unique_id=501712123]
+script = ExtResource("1_main")
+
+[node name="Starting ground" type="StaticBody2D" parent="." unique_id=247292361]
+position = Vector2(240, 510)
+
+[node name="Collision" type="CollisionShape2D" parent="Starting ground" unique_id=759536357]
+position = Vector2(-11, 0)
+shape = SubResource("LeftGroundShape")
+
+[node name="Visual" type="Polygon2D" parent="Starting ground" unique_id=980037011]
+position = Vector2(-11, 0)
+scale = Vector2(0.95416665, 1)
+color = Color(0.34, 0.55, 0.27, 1)
+polygon = PackedVector2Array(-240, -30, 240, -30, 240, 30, -240, 30)
+
+[node name="Top" type="Polygon2D" parent="Starting ground" unique_id=1674305707]
+position = Vector2(-11.500016, 0)
+scale = Vector2(0.9520833, 1)
+color = Color(0.47, 0.73, 0.36, 1)
+polygon = PackedVector2Array(-240, -30, 240, -30, 240, -22, -240, -22)
+
+[node name="MidGround1" type="StaticBody2D" parent="." unique_id=1672788358]
+position = Vector2(980, 510)
+
+[node name="Collision" type="CollisionShape2D" parent="MidGround1" unique_id=975821671]
+shape = SubResource("RightGroundShape")
+
+[node name="Visual" type="Polygon2D" parent="MidGround1" unique_id=176857611]
+color = Color(0.34, 0.55, 0.27, 1)
+polygon = PackedVector2Array(-420, -30, 420, -30, 420, 30, -420, 30)
+
+[node name="Top" type="Polygon2D" parent="MidGround1" unique_id=1038458371]
+color = Color(0.47, 0.73, 0.36, 1)
+polygon = PackedVector2Array(-420, -30, 420, -30, 420, -22, -420, -22)
+
+[node name="MidGround2" type="StaticBody2D" parent="." unique_id=1847172403]
+position = Vector2(1621, 409)
+
+[node name="Collision" type="CollisionShape2D" parent="MidGround2" unique_id=951730479]
+shape = SubResource("MidGround2Shape")
+
+[node name="Visual" type="Polygon2D" parent="MidGround2" unique_id=129906649]
+color = Color(0.34, 0.55, 0.27, 1)
+polygon = PackedVector2Array(-150, -30, 150, -30, 150, 30, -150, 30)
+
+[node name="Top" type="Polygon2D" parent="MidGround2" unique_id=607138865]
+color = Color(0.47, 0.73, 0.36, 1)
+polygon = PackedVector2Array(-150, -30, 150, -30, 150, -22, -150, -22)
+
+[node name="MidGround3" type="StaticBody2D" parent="." unique_id=1392270955]
+position = Vector2(2013, 346)
+
+[node name="Top2" type="CollisionShape2D" parent="MidGround3" unique_id=2087922669]
+shape = SubResource("FinalGroundShape")
+
+[node name="Top3" type="Polygon2D" parent="MidGround3" unique_id=691343149]
+color = Color(0.34, 0.55, 0.27, 1)
+polygon = PackedVector2Array(-150, -30, 150, -30, 150, 30, -150, 30)
+
+[node name="Top" type="Polygon2D" parent="MidGround3" unique_id=779373498]
+color = Color(0.47, 0.73, 0.36, 1)
+polygon = PackedVector2Array(-150, -30, 150, -30, 150, -22, -150, -22)
+
+[node name="MidGround4" type="StaticBody2D" parent="." unique_id=1062576051]
+position = Vector2(2407, 346)
+
+[node name="Collision" type="CollisionShape2D" parent="MidGround4" unique_id=1781943572]
+shape = SubResource("MidGround2Shape")
+
+[node name="Visual" type="Polygon2D" parent="MidGround4" unique_id=957546989]
+color = Color(0.34, 0.55, 0.27, 1)
+polygon = PackedVector2Array(-150, -30, 150, -30, 150, 30, -150, 30)
+
+[node name="Top" type="Polygon2D" parent="MidGround4" unique_id=2020235521]
+color = Color(0.47, 0.73, 0.36, 1)
+polygon = PackedVector2Array(-150, -30, 150, -30, 150, -22, -150, -22)
+
+[node name="MidGround5" type="StaticBody2D" parent="." unique_id=1170906780]
+position = Vector2(2800, 346)
+
+[node name="Collision" type="CollisionShape2D" parent="MidGround5" unique_id=628790708]
+shape = SubResource("MidGround2Shape")
+
+[node name="Visual" type="Polygon2D" parent="MidGround5" unique_id=1606691271]
+color = Color(0.34, 0.55, 0.27, 1)
+polygon = PackedVector2Array(-150, -30, 150, -30, 150, 30, -150, 30)
+
+[node name="Top" type="Polygon2D" parent="MidGround5" unique_id=705910966]
+color = Color(0.47, 0.73, 0.36, 1)
+polygon = PackedVector2Array(-150, -30, 150, -30, 150, -22, -150, -22)
+
+[node name="MidGround6" type="StaticBody2D" parent="." unique_id=1578956887]
+position = Vector2(1551, 560)
+
+[node name="Collision" type="CollisionShape2D" parent="MidGround6" unique_id=43658816]
+shape = SubResource("MidGround2Shape")
+
+[node name="Visual" type="Polygon2D" parent="MidGround6" unique_id=2056164793]
+color = Color(0.34, 0.55, 0.27, 1)
+polygon = PackedVector2Array(-150, -30, 150, -30, 150, 30, -150, 30)
+
+[node name="Top" type="Polygon2D" parent="MidGround6" unique_id=2003171646]
+color = Color(0.47, 0.73, 0.36, 1)
+polygon = PackedVector2Array(-150, -30, 150, -30, 150, -22, -150, -22)
+
+[node name="MidGround7" type="StaticBody2D" parent="." unique_id=739850748]
+position = Vector2(1852, 614)
+
+[node name="Collision" type="CollisionShape2D" parent="MidGround7" unique_id=860488383]
+shape = SubResource("MidGround2Shape")
+
+[node name="Visual" type="Polygon2D" parent="MidGround7" unique_id=695572798]
+color = Color(0.34, 0.55, 0.27, 1)
+polygon = PackedVector2Array(-150, -30, 150, -30, 150, 30, -150, 30)
+
+[node name="Top" type="Polygon2D" parent="MidGround7" unique_id=1939173436]
+color = Color(0.47, 0.73, 0.36, 1)
+polygon = PackedVector2Array(-150, -30, 150, -30, 150, -22, -150, -22)
+
+[node name="MidGround8" type="StaticBody2D" parent="." unique_id=1685408654]
+position = Vector2(2259, 616)
+
+[node name="Collision" type="CollisionShape2D" parent="MidGround8" unique_id=1554989687]
+shape = SubResource("FinalGroundShape")
+
+[node name="Visual" type="Polygon2D" parent="MidGround8" unique_id=1709984623]
+color = Color(0.34, 0.55, 0.27, 1)
+polygon = PackedVector2Array(-150, -30, 150, -30, 150, 30, -150, 30)
+
+[node name="Top" type="Polygon2D" parent="MidGround8" unique_id=248267542]
+color = Color(0.47, 0.73, 0.36, 1)
+polygon = PackedVector2Array(-150, -30, 150, -30, 150, -22, -150, -22)
+
+[node name="MidGround9" type="StaticBody2D" parent="." unique_id=1898989573]
+position = Vector2(2637, 616)
+
+[node name="Collision" type="CollisionShape2D" parent="MidGround9" unique_id=235462162]
+shape = SubResource("MidGround2Shape")
+
+[node name="Visual" type="Polygon2D" parent="MidGround9" unique_id=1512005463]
+color = Color(0.34, 0.55, 0.27, 1)
+polygon = PackedVector2Array(-150, -30, 150, -30, 150, 30, -150, 30)
+
+[node name="Top" type="Polygon2D" parent="MidGround9" unique_id=1130423150]
+color = Color(0.47, 0.73, 0.36, 1)
+polygon = PackedVector2Array(-150, -30, 150, -30, 150, -22, -150, -22)
+
+[node name="MidGround10" type="StaticBody2D" parent="." unique_id=1439263783]
+position = Vector2(2397, 810)
+
+[node name="Collision" type="CollisionShape2D" parent="MidGround10" unique_id=26504122]
+shape = SubResource("RightGroundShape")
+
+[node name="Visual" type="Polygon2D" parent="MidGround10" unique_id=633325780]
+color = Color(0.34, 0.55, 0.27, 1)
+polygon = PackedVector2Array(-420, -30, 420, -30, 420, 30, -420, 30)
+
+[node name="Top" type="Polygon2D" parent="MidGround10" unique_id=315602181]
+color = Color(0.47, 0.73, 0.36, 1)
+polygon = PackedVector2Array(-420, -30, 420, -30, 420, -22, -420, -22)
+
+[node name="MidGround10_5" type="StaticBody2D" parent="." unique_id=770127691]
+position = Vector2(2653, 808)
+
+[node name="Collision" type="CollisionShape2D" parent="MidGround10_5" unique_id=1666557920]
+position = Vector2(-127, 2.5)
+shape = SubResource("RectangleShape2D_5vw27")
+
+[node name="Visual" type="Polygon2D" parent="MidGround10_5" unique_id=1672608688]
+position = Vector2(-127, 0)
+scale = Vector2(1.3023809, 1)
+color = Color(0.34, 0.55, 0.27, 1)
+polygon = PackedVector2Array(-420, -30, 420, -30, 420, 30, -420, 30)
+
+[node name="Top" type="Polygon2D" parent="MidGround10_5" unique_id=1889800909]
+position = Vector2(-124, 0)
+scale = Vector2(1.2952381, 1)
+color = Color(0.47, 0.73, 0.36, 1)
+polygon = PackedVector2Array(-420, -30, 420, -30, 420, -22, -420, -22)
+
+[node name="EndGround" type="StaticBody2D" parent="." unique_id=619025760]
+position = Vector2(3431, 747)
+
+[node name="Collision" type="CollisionShape2D" parent="EndGround" unique_id=974715387]
+shape = SubResource("EndGroundShape")
+
+[node name="Visual" type="Polygon2D" parent="EndGround" unique_id=2095009796]
+color = Color(0.34, 0.55, 0.27, 1)
+polygon = PackedVector2Array(-380, -30, 380, -30, 380, 30, -380, 30)
+
+[node name="Top" type="Polygon2D" parent="EndGround" unique_id=709500971]
+color = Color(0.47, 0.73, 0.36, 1)
+polygon = PackedVector2Array(-380, -30, 380, -30, 380, -22, -380, -22)
+
+[node name="Player" type="CharacterBody2D" parent="." unique_id=220709264]
+position = Vector2(100, 456)
+script = ExtResource("2_player")
+
+[node name="Collision" type="CollisionShape2D" parent="Player" unique_id=51292228]
+position = Vector2(0, -3.5)
+shape = SubResource("PlayerShape")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Player" unique_id=971641669]
+position = Vector2(-7.000001, -19.000008)
+scale = Vector2(0.22290282, 0.22150004)
+sprite_frames = SubResource("SpriteFrames_getpj")
+animation = &"1_idle_girl"
+
+[node name="Camera2D" type="Camera2D" parent="Player" unique_id=1361462569]
+limit_left = 0
+limit_top = 0
+limit_right = 3900
+limit_bottom = 1100
+position_smoothing_enabled = true
+
+[node name="Flagpole" type="Node2D" parent="." unique_id=1974577548]
+position = Vector2(3711, 717)
+
+[node name="Base" type="Polygon2D" parent="Flagpole" unique_id=1040766875]
+color = Color(0.4, 0.4, 0.45, 1)
+polygon = PackedVector2Array(-18, -10, 18, -10, 18, 0, -18, 0)
+
+[node name="Pole" type="Polygon2D" parent="Flagpole" unique_id=589387195]
+color = Color(0.88, 0.88, 0.92, 1)
+polygon = PackedVector2Array(-4, -240, 4, -240, 4, -10, -4, -10)
+
+[node name="PoleCap" type="Polygon2D" parent="Flagpole" unique_id=736612072]
+position = Vector2(0, -244)
+color = Color(0.95, 0.78, 0.2, 1)
+polygon = PackedVector2Array(-6, 0, 6, 0, 0, -10)
+
+[node name="Flag" type="Polygon2D" parent="Flagpole" unique_id=483209806]
+position = Vector2(4, -230)
+color = Color(0.95, 0.3, 0.3, 1)
+polygon = PackedVector2Array(0, 0, 46, 14, 0, 28)
+
+[node name="WinArea" type="Area2D" parent="Flagpole" unique_id=1637293026]
+position = Vector2(0, -130)
+
+[node name="Collision" type="CollisionShape2D" parent="Flagpole/WinArea" unique_id=9097336]
+shape = SubResource("FlagShape")
+
+[node name="SpikeStrip2" type="Area2D" parent="." unique_id=2053124889]
+position = Vector2(3363, 709)
+
+[node name="Collision" type="CollisionShape2D" parent="SpikeStrip2" unique_id=622388834]
+position = Vector2(0, 5)
+shape = SubResource("SpikeShape")
+
+[node name="Teeth" type="Polygon2D" parent="SpikeStrip2" unique_id=1298421507]
+color = Color(0.85, 0.15, 0.15, 1)
+polygon = PackedVector2Array(-40, 8, -32, -8, -24, 8, -16, -8, -8, 8, 0, -8, 8, 8, 16, -8, 24, 8, 32, -8, 40, 8)
+
+[node name="Base" type="Polygon2D" parent="SpikeStrip2" unique_id=753075265]
+color = Color(0.65, 0.1, 0.1, 1)
+polygon = PackedVector2Array(-40, 8, 40, 8, 40, 12, -40, 12)
+
+[node name="KillZone" type="Area2D" parent="." unique_id=1502193794]
+position = Vector2(1658, 1587)
+
+[node name="Collision" type="CollisionShape2D" parent="KillZone" unique_id=2124710891]
+shape = SubResource("KillZoneShape")
+
+[node name="Overlay" type="CanvasLayer" parent="." unique_id=1482519911]
+visible = false
+
+[node name="Backdrop" type="ColorRect" parent="Overlay" unique_id=1682618011]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.55)
+
+[node name="Center" type="VBoxContainer" parent="Overlay" unique_id=1236438643]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -80.0
+offset_right = 240.0
+offset_bottom = 80.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="Result" type="Label" parent="Overlay/Center" unique_id=977797106]
+layout_mode = 2
+theme_override_font_sizes/font_size = 56
+text = "You Win!"
+horizontal_alignment = 1
+
+[node name="Prompt" type="Label" parent="Overlay/Center" unique_id=517795957]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Press R to restart"
+horizontal_alignment = 1
+
+[node name="SearchGraph" type="Node2D" parent="." unique_id=1222267351]
+
+[node name="GraphNode00" type="Marker2D" parent="SearchGraph" unique_id=242984525]
+position = Vector2(103, 466)
+script = ExtResource("5_search_graph_node")
+graph_id = 0
+
+[node name="GraphNode01" type="Marker2D" parent="SearchGraph" unique_id=118375222]
+position = Vector2(439, 461)
+script = ExtResource("5_search_graph_node")
+graph_id = 1
+
+[node name="GraphNode02" type="Marker2D" parent="SearchGraph" unique_id=1950699642]
+position = Vector2(579, 462)
+script = ExtResource("5_search_graph_node")
+graph_id = 2
+
+[node name="GraphNode03" type="Marker2D" parent="SearchGraph" unique_id=444374938]
+position = Vector2(981, 458)
+script = ExtResource("5_search_graph_node")
+graph_id = 3
+
+[node name="GraphNode04" type="Marker2D" parent="SearchGraph" unique_id=1422196819]
+position = Vector2(1393, 451)
+script = ExtResource("5_search_graph_node")
+graph_id = 4
+
+[node name="GraphNode05" type="Marker2D" parent="SearchGraph" unique_id=486353174]
+position = Vector2(1502, 353)
+script = ExtResource("5_search_graph_node")
+graph_id = 5
+
+[node name="GraphNode06" type="Marker2D" parent="SearchGraph" unique_id=1524721280]
+position = Vector2(1749, 347)
+script = ExtResource("5_search_graph_node")
+graph_id = 6
+
+[node name="GraphNode07" type="Marker2D" parent="SearchGraph" unique_id=1377967463]
+position = Vector2(1958, 299)
+script = ExtResource("5_search_graph_node")
+graph_id = 7
+
+[node name="GraphNode08" type="Marker2D" parent="SearchGraph" unique_id=2033290070]
+position = Vector2(2156, 300)
+script = ExtResource("5_search_graph_node")
+graph_id = 8
+
+[node name="GraphNode09" type="Marker2D" parent="SearchGraph" unique_id=18062507]
+position = Vector2(2277, 299)
+script = ExtResource("5_search_graph_node")
+graph_id = 9
+
+[node name="GraphNode10" type="Marker2D" parent="SearchGraph" unique_id=1444507111]
+position = Vector2(2534, 298)
+script = ExtResource("5_search_graph_node")
+graph_id = 10
+
+[node name="GraphNode11" type="Marker2D" parent="SearchGraph" unique_id=1877198095]
+position = Vector2(2676, 294)
+script = ExtResource("5_search_graph_node")
+graph_id = 11
+
+[node name="GraphNode12" type="Marker2D" parent="SearchGraph" unique_id=182450738]
+position = Vector2(2936, 293)
+script = ExtResource("5_search_graph_node")
+graph_id = 12
+
+[node name="GraphNode13" type="Marker2D" parent="SearchGraph" unique_id=1389239120]
+position = Vector2(3270, 671)
+script = ExtResource("5_search_graph_node")
+graph_id = 13
+
+[node name="GraphNode14" type="Marker2D" parent="SearchGraph" unique_id=1818783296]
+position = Vector2(1677, 502)
+script = ExtResource("5_search_graph_node")
+graph_id = 14
+
+[node name="GraphNode15" type="Marker2D" parent="SearchGraph" unique_id=1048603489]
+position = Vector2(1986, 543)
+script = ExtResource("5_search_graph_node")
+graph_id = 15
+
+[node name="GraphNode16" type="Marker2D" parent="SearchGraph" unique_id=572387627]
+position = Vector2(2117, 546)
+script = ExtResource("5_search_graph_node")
+graph_id = 16
+
+[node name="GraphNode17" type="Marker2D" parent="SearchGraph" unique_id=1720730037]
+position = Vector2(2208, 550)
+script = ExtResource("5_search_graph_node")
+graph_id = 17
+
+[node name="GraphNode18" type="Marker2D" parent="SearchGraph" unique_id=1486952490]
+position = Vector2(2388, 552)
+script = ExtResource("5_search_graph_node")
+graph_id = 18
+
+[node name="GraphNode19" type="Marker2D" parent="SearchGraph" unique_id=1206057593]
+position = Vector2(2520, 548)
+script = ExtResource("5_search_graph_node")
+graph_id = 19
+
+[node name="GraphNode20" type="Marker2D" parent="SearchGraph" unique_id=1527708090]
+position = Vector2(2768, 551)
+script = ExtResource("5_search_graph_node")
+graph_id = 20
+
+[node name="GraphNode21" type="Marker2D" parent="SearchGraph" unique_id=1681026467]
+position = Vector2(2991, 740)
+script = ExtResource("5_search_graph_node")
+graph_id = 21
+
+[node name="GraphNode22" type="Marker2D" parent="SearchGraph" unique_id=1419823768]
+position = Vector2(3470, 666)
+script = ExtResource("5_search_graph_node")
+graph_id = 22
+
+[node name="GraphNode23" type="Marker2D" parent="SearchGraph" unique_id=1412754240]
+position = Vector2(3599, 668)
+script = ExtResource("5_search_graph_node")
+graph_id = 23
+
+[node name="GraphNode24" type="Marker2D" parent="SearchGraph" unique_id=1118243771]
+position = Vector2(3711, 717)
+script = ExtResource("5_search_graph_node")
+graph_id = 24
+
+[node name="GraphNode25" type="Marker2D" parent="SearchGraph" unique_id=52859391]
+position = Vector2(2041, 751)
+script = ExtResource("5_search_graph_node")
+graph_id = 25
+
+[node name="GraphNode26" type="Marker2D" parent="SearchGraph" unique_id=1737279864]
+position = Vector2(2525, 763)
+script = ExtResource("5_search_graph_node")
+graph_id = 26
+
+[node name="GraphNode27" type="Marker2D" parent="SearchGraph" unique_id=1400456886]
+position = Vector2(3118, 673)
+script = ExtResource("5_search_graph_node")
+graph_id = 27
+
+[node name="AIController" type="Node" parent="." unique_id=473080404]
+process_physics_priority = -10
+script = ExtResource("3_ai_controller")
+
+[node name="SearchGraphOverlay" type="Node2D" parent="." unique_id=86293254]
+script = ExtResource("4_search_overlay")
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=1442655820]
+
+[node name="MetricsLabel" type="Label" parent="HUD" unique_id=1186665204]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 18.0
+offset_top = -186.0
+offset_right = 362.0
+offset_bottom = -18.0
+grow_vertical = 0
+theme_override_colors/font_color = Color(1, 0.95, 0.85, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 16
+vertical_alignment = 2
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=535367615]
+stream = ExtResource("12_dg77c")

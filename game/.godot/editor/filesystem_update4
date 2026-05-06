@@ -1,0 +1,3 @@
+res://scripts/demo_manager.gd
+res://scripts/agent/path_following_agent.gd
+res://scripts/search/search_metrics.gd
